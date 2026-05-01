@@ -1,70 +1,91 @@
+import { useState } from "react";
+import ordersData from "../data/orders.json";
 import PageHeader from "../components/PageHeader";
-// Pastikan path import ini sesuai dengan tempat kamu menyimpan file JSON tadi
-import orderData from "../data/orders.json"; 
 
-export default function Orders() {
+export default function Order() {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filterStatus, setFilterStatus] = useState("All");
+
+    // Fungsi helper untuk warna badge status
+    const getStatusColor = (status) => {
+        switch (status) {
+            case "Completed": return "bg-green-100 text-green-600";
+            case "Pending": return "bg-yellow-100 text-yellow-600";
+            case "Cancelled": return "bg-red-100 text-red-600";
+            default: return "bg-gray-100 text-gray-600";
+        }
+    };
+
+    // Logika Filtering
+    const filteredOrders = ordersData.filter(order => {
+        const matchesSearch = order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                             order.orderId.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = filterStatus === "All" || order.status === filterStatus;
+        return matchesSearch && matchesStatus;
+    });
+
     return (
-        <div id="orders-container" className="p-10 animate-in fade-in duration-700">   
-            
-            {/* Mengaktifkan PageHeader dengan props baru */}
-            <PageHeader 
-                title="Orders" 
-                breadcrumb={["Dashboard", "Order List"]}
-            >
-                {/* Tombol Add Order dimasukkan sebagai children */}
-                <button 
-                    id="add-button" 
-                    className="bg-hijau hover:bg-green-600 text-white px-10 py-4 rounded-2xl font-bold shadow-xl shadow-green-100 transition-all active:scale-95 flex items-center gap-2"
-                >
-                    <span className="text-xl">+</span> Add New Order
-                </button>
-            </PageHeader>
+        <div className="p-8">
+            <PageHeader title="Order List" breadcrumb={["Dashboard", "Order List"]} />
 
-            <div id="orders-table" className="mt-10 overflow-x-auto rounded-[2rem] border border-gray-50 bg-white shadow-sm">           
-                <table className="w-full table-auto">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Order ID</th>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Customer Name</th>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Total Price</th>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Order Date</th>
-                            <th className="px-6 py-5 text-left text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                        {/* Iterasi 30 data dari JSON */}
-                        {orderData.map((order) => (
-                            <tr key={order.orderId} className="hover:bg-gray-50 transition-colors">
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                                    #{order.orderId}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                                    {order.customerName}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${
-                                        order.status === 'Completed' ? 'bg-green-100 text-green-700' : 
-                                        order.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : 
-                                        'bg-red-100 text-red-700'
-                                    }`}>
-                                        {order.status}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-700">
-                                    {order.totalPrice}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {order.orderDate}
-                                </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-center">
-                                    <button className="text-hijau hover:underline font-bold">View</button>
-                                    <button className="ml-4 text-red-500 hover:underline font-bold">Delete</button>
-                                </td>
-                            </tr>
+            <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
+                {/* Toolbar: Search & Filter */}
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                    <input 
+                        type="text"
+                        placeholder="Search customer or ID..."
+                        className="w-full md:w-80 p-3 bg-gray-50 rounded-xl outline-none focus:ring-2 focus:ring-green-500/20 border border-transparent focus:border-green-500"
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                        {["All", "Completed", "Pending", "Cancelled"].map(status => (
+                            <button
+                                key={status}
+                                onClick={() => setFilterStatus(status)}
+                                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                                    filterStatus === status 
+                                    ? "bg-hijau text-white shadow-lg shadow-green-100" 
+                                    : "bg-gray-50 text-gray-500 hover:bg-gray-100"
+                                }`}
+                            >
+                                {status}
+                            </button>
                         ))}
-                    </tbody>
-                </table>
+                    </div>
+                </div>
+
+                {/* Table */}
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="text-gray-400 text-sm uppercase tracking-wider border-b border-gray-50">
+                                <th className="pb-4 font-semibold">Order ID</th>
+                                <th className="pb-4 font-semibold">Customer</th>
+                                <th className="pb-4 font-semibold">Date</th>
+                                <th className="pb-4 font-semibold">Price</th>
+                                <th className="pb-4 font-semibold">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-50">
+                            {filteredOrders.map((order) => (
+                                <tr key={order.orderId} className="hover:bg-gray-50/50 transition-colors group">
+                                    <td className="py-4 font-bold text-hijau">{order.orderId}</td>
+                                    <td className="py-4 font-medium text-gray-700">{order.customerName}</td>
+                                    <td className="py-4 text-gray-500 text-sm">{order.orderDate}</td>
+                                    <td className="py-4 font-bold text-gray-800">{order.totalPrice}</td>
+                                    <td className="py-4">
+                                        <span className={`px-4 py-1.5 rounded-lg text-xs font-bold ${getStatusColor(order.status)}`}>
+                                            {order.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                    {filteredOrders.length === 0 && (
+                        <div className="text-center py-10 text-gray-400 italic">No orders found.</div>
+                    )}
+                </div>
             </div>
         </div>
     );

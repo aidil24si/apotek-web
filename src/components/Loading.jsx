@@ -1,8 +1,12 @@
+// src/components/Loading.jsx
 export default function Loading() {
     return (
-        <div className=" flex flex-col justify-center items-center min-h-screen bg-white">
-            <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p className="text-green-600 text-lg">Loading...</p>
+        <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50/50 backdrop-blur-sm">
+            {/* Spinner Biru Medis */}
+            <div className="h-16 w-16 animate-spin rounded-full border-8 border-gray-200 border-t-biru"></div>
+            <p className="mt-4 font-poppins font-bold text-gray-500 animate-pulse">
+                Menyiapkan Data Apotek...
+            </p>
         </div>
     );
 }
