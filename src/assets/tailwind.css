@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  /* Definisi warna kustom Sedap. agar class bg-hijau dll berfungsi */
+  --color-hijau: #00b074;
+  --color-merah: #ff5b5b;
+  --color-biru: #2d9cdb;
+  --color-kuning: #ffbb00;
+  --color-latar: #f3f4f6;
+  --color-teks-abu: #b9bbbd;
+}
+
+/* Tambahan agar font lebih mirip Figma */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+
+body {
+  font-family: 'Poppins', sans-serif;
+}
