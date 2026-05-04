@@ -21,15 +21,17 @@ export default function Forgot() {
                     <input
                         type="email"
                         id="email"
+                        // FOKUS: Tambahkan focus:ring-biru dan border-biru saat aktif
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm
-                            placeholder-gray-400"
+                            placeholder-gray-400 outline-none focus:ring-2 focus:ring-biru/20 focus:border-biru transition-all"
                         placeholder="you@example.com"
                     />
                 </div>
                 <button
                     type="submit"
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4
-                        rounded-lg transition duration-300"
+                    // FOKUS: Ganti bg-green-500 ke bg-biru dan hover:bg-green-600 ke hover:brightness-90
+                    className="w-full bg-biru hover:bg-biru/90 text-white font-semibold py-2 px-4
+                        rounded-lg transition duration-300 shadow-md shadow-biru/20 active:scale-[0.98]"
                 >
                     Send Reset Link
                 </button>

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "OBT-001",
+    "name": "Paracetamol 500mg",
+    "category": "Obat Bebas",
+    "stock": 150,
+    "minStock": 50,
+    "unit": "Tablet",
+    "price": "Rp 5.000"
+  },
+  {
+    "id": "OBT-002",
+    "name": "Amoxicillin",
+    "category": "Obat Keras",
+    "stock": 20,
+    "minStock": 30,
+    "unit": "Strip",
+    "price": "Rp 12.000"
+  }
+]

@@ -4,15 +4,25 @@ export default function ErrorPage({ errorCode, errorTitle, errorImg }) {
             <img 
                 src={errorImg || "https://illustrations.popsy.co/gray/error-404.svg"} 
                 alt={`Error ${errorCode}`} 
-                className="w-64 mb-8 drop-shadow-md" 
+                className="w-64 mb-8 drop-shadow-md opacity-80" 
             />
-            <h1 className="text-8xl font-black text-gray-900 leading-none">{errorCode}</h1>
-            <p className="text-xl text-gray-500 mt-4 font-medium max-w-md mx-auto">{errorTitle}</p>
+            
+            {/* Teks Error Code dengan warna Biru */}
+            <h1 className="text-8xl font-black text-biru leading-none">{errorCode}</h1>
+            
+            <p className="text-xl text-gray-500 mt-4 font-medium max-w-md mx-auto">
+                {errorTitle || "Maaf, halaman yang Anda cari tidak ditemukan."}
+            </p>
+
             <button 
                 onClick={() => window.history.back()}
-                className="mt-10 bg-hijau hover:bg-green-600 text-white px-8 py-3 rounded-2xl font-bold shadow-lg shadow-green-100 transition-all active:scale-95"
+                // {/* FOKUS PERUBAHAN: 
+                //   - bg-hijau -> bg-biru
+                //   - shadow-green -> shadow-biru/20
+                // */\}
+                className="mt-10 bg-biru hover:bg-blue-600 text-white px-10 py-3.5 rounded-2xl font-bold shadow-lg shadow-biru/20 transition-all active:scale-95 flex items-center gap-2"
             >
-                Back to Previous Page
+                <span>Kembali ke Halaman Sebelumnya</span>
             </button>
         </div>
     );

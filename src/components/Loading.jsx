@@ -1,12 +1,21 @@
-// src/components/Loading.jsx
 export default function Loading() {
     return (
-        <div className="flex h-screen w-full flex-col items-center justify-center bg-gray-50/50 backdrop-blur-sm">
-            {/* Spinner Biru Medis */}
-            <div className="h-16 w-16 animate-spin rounded-full border-8 border-gray-200 border-t-biru"></div>
-            <p className="mt-4 font-poppins font-bold text-gray-500 animate-pulse">
-                Menyiapkan Data Apotek...
-            </p>
+        <div className="flex flex-col justify-center items-center min-h-screen bg-white animate-in fade-in duration-500">
+            {/* Spinner Biru dengan ketebalan border yang pas */}
+            <div className="relative">
+                <div className="w-14 h-14 border-4 border-biru/20 rounded-full"></div>
+                <div className="w-14 h-14 border-4 border-biru border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+            </div>
+            
+            {/* Teks Loading dengan efek pulse */}
+            <div className="mt-6 flex flex-col items-center gap-2">
+                <p className="text-biru text-lg font-bold tracking-widest animate-pulse">
+                    MEMUAT DATA...
+                </p>
+                <span className="text-[10px] text-gray-400 font-medium uppercase tracking-[0.3em]">
+                    Apotek Sehat System
+                </span>
+            </div>
         </div>
     );
 }

@@ -16,8 +16,9 @@ export default function Register() {
                     <input
                         type="email"
                         id="email"
+                        // FOKUS: Menggunakan focus:ring-biru dan focus:border-biru
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm
-                            placeholder-gray-400"
+                            placeholder-gray-400 outline-none focus:ring-2 focus:ring-biru/20 focus:border-biru transition-all"
                         placeholder="you@example.com"
                     />
                 </div>
@@ -32,8 +33,9 @@ export default function Register() {
                     <input
                         type="password"
                         id="password"
+                        // FOKUS: Menggunakan focus:ring-biru dan focus:border-biru
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm
-                            placeholder-gray-400"
+                            placeholder-gray-400 outline-none focus:ring-2 focus:ring-biru/20 focus:border-biru transition-all"
                         placeholder="********"
                     />
                 </div>
@@ -48,16 +50,18 @@ export default function Register() {
                     <input
                         type="password"
                         id="confirmPassword"
+                        // FOKUS: Menggunakan focus:ring-biru dan focus:border-biru
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-300 rounded-lg shadow-sm
-                            placeholder-gray-400"
+                            placeholder-gray-400 outline-none focus:ring-2 focus:ring-biru/20 focus:border-biru transition-all"
                         placeholder="********"
                     />
                 </div>
 
                 <button
                     type="submit"
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4
-                        rounded-lg transition duration-300"
+                    // FOKUS: Ganti bg-green-500 ke bg-biru dan tambahkan shadow-biru/20
+                    className="w-full bg-biru hover:bg-biru/90 text-white font-semibold py-2 px-4
+                        rounded-lg transition duration-300 shadow-lg shadow-biru/20 active:scale-[0.98]"
                 >
                     Register
                 </button>
