@@ -6,8 +6,10 @@ import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 import Loading from "./components/Loading";
 
-
 function App() {
+  // Mengubah nama variabel menjadi LandingPage agar konsisten dengan nama file
+  const LandingPage = React.lazy(() => import("./pages/LandingPage"));
+
   const Dashboard = React.lazy(() => import("./pages/Dashboard"));
   const Orders = React.lazy(() => import("./pages/Orders"));
   const Customers = React.lazy(() => import("./pages/Customers"));
@@ -16,17 +18,42 @@ function App() {
   const Register = React.lazy(() => import("./pages/auth/Register"));
   const Forgot = React.lazy(() => import("./pages/auth/Forgot"));
   const Inventory = React.lazy(() => import("./pages/Inventory"));
+
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
+        
+        {/* =========================================================
+            1. ROUTE PUBLIK (Tanpa Sidebar)
+            Diletakkan secara mandiri di luar MainLayout atau AuthLayout
+        ========================================================= */}
+        <Route path="/" element={<LandingPage />} />
+
+
+        {/* =========================================================
+            2. ROUTE AUTENTIKASI (Layout khusus Login/Register)
+        ========================================================= */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot" element={<Forgot />} />
+        </Route>
+
+
+        {/* =========================================================
+            3. ROUTE ADMIN (Dengan Sidebar & Header)
+            Semua route di dalam sini akan memiliki Layout Admin
+        ========================================================= */}
         <Route element={<MainLayout />}>
-          {/* Main Routes */}
-          <Route path="/" element={<Dashboard />} />
+          {/* Pindahkan Dashboard ke path /dashboard */}
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Main Routes lainnya */}
           <Route path="/orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
           <Route path="/inventory" element={<Inventory />} />
 
-          {/* Error Pages Test Routes sesuai instruksi latihan */}
+          {/* Error Pages */}
           <Route
             path="/error-400"
             element={
@@ -70,11 +97,7 @@ function App() {
             }
           />
         </Route>
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot" element={<Forgot />} />
-        </Route>
+
       </Routes>
     </Suspense>
   );
