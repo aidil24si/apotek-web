@@ -23,7 +23,7 @@ export default function Login() {
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
-            navigate("/");
+            navigate("/dashboard");
         }, 1500);
     };
 
