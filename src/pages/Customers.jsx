@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Tambahkan ini
 import patientData from "../data/customers.json"; 
 import PageHeader from "../components/PageHeader";
 import { FaSearch, FaUserPlus, FaPhoneAlt } from "react-icons/fa";
@@ -6,6 +7,7 @@ import { MdOutlineLocationOn } from "react-icons/md";
 
 export default function Customers() {
     const [search, setSearch] = useState("");
+    const navigate = useNavigate(); // Inisialisasi navigasi
 
     const filteredPatients = (patientData || []).filter(p => 
         p.name.toLowerCase().includes(search.toLowerCase()) || 
@@ -14,7 +16,6 @@ export default function Customers() {
 
     return (
         <div className="p-8 animate-in fade-in slide-in-from-bottom-4 duration-700 bg-[#F9FAFB] min-h-screen">
-            {/* Page Header dengan tombol Branding Biru #2563EB */}
             <PageHeader title="Data Pasien" breadcrumb={["Apotek", "Daftar Pasien"]}>
                 <button className="flex items-center gap-2 bg-[#2563EB] text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-blue-600/20 hover:scale-105 active:scale-95 transition-all">
                     <FaUserPlus className="text-lg" />
@@ -22,10 +23,8 @@ export default function Customers() {
                 </button>
             </PageHeader>
 
-            {/* Container Utama dengan radius melengkung ala Figma */}
             <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 mt-6">
                 
-                {/* Bagian Pencarian dengan style Input Login yang konsisten */}
                 <div className="relative mb-8 max-w-md group">
                     <input 
                         type="text" 
@@ -36,7 +35,6 @@ export default function Customers() {
                     <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[#2563EB] transition-colors" />
                 </div>
 
-                {/* Tabel Data Pasien */}
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-separate border-spacing-y-0">
                         <thead>
@@ -80,7 +78,11 @@ export default function Customers() {
                                         </span>
                                     </td>
                                     <td className="px-4 py-5 text-center">
-                                        <button className="bg-white border border-gray-200 text-[#2563EB] font-bold text-[11px] px-4 py-2 rounded-xl shadow-sm hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all active:scale-95">
+                                        {/* Arahkan ke halaman detail pasien */}
+                                        <button 
+                                            onClick={() => navigate(`/customers/${patient.id}`)}
+                                            className="bg-white border border-gray-200 text-[#2563EB] font-bold text-[11px] px-4 py-2 rounded-xl shadow-sm hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] transition-all active:scale-95"
+                                        >
                                             Detail Profil
                                         </button>
                                     </td>
@@ -89,7 +91,6 @@ export default function Customers() {
                         </tbody>
                     </table>
                     
-                    {/* Empty State dengan style modern */}
                     {filteredPatients.length === 0 && (
                         <div className="py-24 text-center">
                             <div className="inline-flex p-8 bg-[#F3F4F6] rounded-[2rem] mb-6 shadow-inner">

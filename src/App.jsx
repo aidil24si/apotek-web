@@ -18,6 +18,8 @@ function App() {
   const Register = React.lazy(() => import("./pages/auth/Register"));
   const Forgot = React.lazy(() => import("./pages/auth/Forgot"));
   const Inventory = React.lazy(() => import("./pages/Inventory"));
+  const CustomerDetail = React.lazy(() => import("./pages/CustomerDetail"));
+  const MedicineDetail = React.lazy(() => import("./pages/MedicineDetail"));
 
   return (
     <Suspense fallback={<Loading />}>
@@ -51,7 +53,10 @@ function App() {
           {/* Main Routes lainnya */}
           <Route path="/orders" element={<Orders />} />
           <Route path="/customers" element={<Customers />} />
+          <Route path="/customers/:id" element={<CustomerDetail />} />
           <Route path="/inventory" element={<Inventory />} />
+          <Route path="/inventory/:id" element={<MedicineDetail />} />
+
 
           {/* Error Pages */}
           <Route

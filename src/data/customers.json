@@ -1,6 +1,50 @@
 [
-  { "id": "PS-001", "name": "Budi Santoso", "address": "Jl. Merdeka No. 10", "phone": "0812-3456-7890", "lastVisit": "2026-04-20" },
-  { "id": "PS-002", "name": "Siti Aminah", "address": "Jl. Mawar No. 5", "phone": "0857-1122-3344", "lastVisit": "2026-04-22" },
-  { "id": "PS-003", "name": "Andi Wijaya", "address": "Perum Indah B-12", "phone": "0813-9988-7766", "lastVisit": "2026-04-25" },
-  { "id": "PS-004", "name": "Dewi Lestari", "address": "Apartemen Green View", "phone": "0812-5544-3322", "lastVisit": "2026-04-28" }
+  { 
+    "id": "PS-001", 
+    "name": "Budi Santoso", 
+    "address": "Jl. Merdeka No. 10", 
+    "phone": "0812-3456-7890", 
+    "lastVisit": "2026-04-20",
+    "age": 45,
+    "gender": "Laki-laki",
+    "bloodType": "O",
+    "allergies": "Amoxicillin",
+    "medicalHistory": "Hipertensi ringan, Maag"
+  },
+  { 
+    "id": "PS-002", 
+    "name": "Siti Aminah", 
+    "address": "Jl. Mawar No. 5", 
+    "phone": "0857-1122-3344", 
+    "lastVisit": "2026-04-22",
+    "age": 32,
+    "gender": "Perempuan",
+    "bloodType": "A",
+    "allergies": "Tidak ada",
+    "medicalHistory": "Asma"
+  },
+  { 
+    "id": "PS-003", 
+    "name": "Andi Wijaya", 
+    "address": "Perum Indah B-12", 
+    "phone": "0813-9988-7766", 
+    "lastVisit": "2026-04-25",
+    "age": 28,
+    "gender": "Laki-laki",
+    "bloodType": "B",
+    "allergies": "Seafood",
+    "medicalHistory": "Pernah tipes tahun 2024"
+  },
+  { 
+    "id": "PS-004", 
+    "name": "Dewi Lestari", 
+    "address": "Apartemen Green View", 
+    "phone": "0812-5544-3322", 
+    "lastVisit": "2026-04-28",
+    "age": 50,
+    "gender": "Perempuan",
+    "bloodType": "AB",
+    "allergies": "Kacang-kacangan",
+    "medicalHistory": "Diabetes Tipe 2"
+  }
 ]

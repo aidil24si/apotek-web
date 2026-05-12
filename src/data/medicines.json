@@ -6,7 +6,12 @@
     "stock": 150,
     "minStock": 50,
     "unit": "Tablet",
-    "price": "Rp 5.000"
+    "price": "Rp 5.000",
+    "description": "Obat penurun panas dan pereda nyeri ringan hingga sedang.",
+    "manufacturer": "PT Kimia Farma",
+    "expiryDate": "2027-12-31",
+    "composition": "Paracetamol 500mg",
+    "sideEffects": "Jarang terjadi, pada dosis tinggi dapat menyebabkan kerusakan hati."
   },
   {
     "id": "OBT-002",
@@ -15,6 +20,11 @@
     "stock": 20,
     "minStock": 30,
     "unit": "Strip",
-    "price": "Rp 12.000"
+    "price": "Rp 12.000",
+    "description": "Antibiotik penisilin untuk mengobati berbagai macam infeksi bakteri.",
+    "manufacturer": "PT Sanbe Farma",
+    "expiryDate": "2026-08-15",
+    "composition": "Amoxicillin trihydrate 500mg",
+    "sideEffects": "Mual, muntah, ruam kulit, reaksi alergi pada pasien sensitif penisilin."
   }
 ]
