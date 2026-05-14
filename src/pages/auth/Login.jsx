@@ -7,6 +7,7 @@ export default function Login() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [errorMsg, setErrorMsg] = useState(""); // State baru untuk menyimpan pesan error
     const [dataForm, setDataForm] = useState({
         email: "",
         password: "",
@@ -16,14 +17,25 @@ export default function Login() {
     const handleChange = (evt) => {
         const { name, value } = evt.target;
         setDataForm({ ...dataForm, [name]: value });
+        // Sembunyikan error jika pengguna mengubah inputan
+        if (errorMsg) setErrorMsg(""); 
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
+        setErrorMsg(""); // Reset error setiap kali submit
+
         setTimeout(() => {
             setLoading(false);
-            navigate("/dashboard");
+            // Pengecekan Role di sini
+            if (dataForm.role === "Admin") {
+                // Jika Admin, arahkan ke dashboard
+                navigate("/dashboard"); 
+            } else {
+                // Jika bukan Admin, tampilkan pesan error dan gagalkan navigasi
+                setErrorMsg(`Akses ditolak. Dashboard hanya untuk Admin. (Anda memilih: ${dataForm.role})`);
+            }
         }, 1500);
     };
 
@@ -38,6 +50,13 @@ export default function Login() {
                     Silakan login untuk melanjutkan
                 </p>
             </div>
+
+            {/* Area Pesan Error */}
+            {errorMsg && (
+                <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-semibold text-center animate-in fade-in zoom-in duration-300">
+                    {errorMsg}
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Input Email/Username */}

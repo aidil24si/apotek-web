@@ -1,10 +1,21 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Tambahkan import ini
 import { FaBell, FaSearch, FaBars } from "react-icons/fa";
 import { FcAreaChart } from "react-icons/fc";
 import { SlSettings } from "react-icons/sl";
 
 export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const navigate = useNavigate(); // Inisialisasi fungsi navigasi
+
+    // Fungsi untuk menangani proses logout
+    const handleLogout = () => {
+        // Jika Anda menggunakan localStorage/sessionStorage, Anda bisa menghapusnya di sini
+        // contoh: localStorage.removeItem("token");
+        
+        // Arahkan kembali ke halaman login (atau "/" jika ingin ke landing page)
+        navigate("/");
+    };
 
     return (
         <div id="header-container" className="flex items-center justify-between bg-white px-4 md:px-10 py-4 shadow-sm relative z-30">
@@ -117,13 +128,16 @@ export default function Header() {
                         <div className="absolute top-14 right-0 hidden md:group-hover:block w-56 bg-white border border-gray-100 shadow-2xl rounded-2xl p-5 z-50 animate-in slide-in-from-top-2">
                             <div className="text-center">
                                 <p className="font-bold text-gray-800">Aidil Ikhsan</p>
-                                {/* Saya ubah keterangan dari Sedap Resto ke Apotek menyesuaikan tema aplikasi */}
                                 <p className="text-[10px] text-gray-400 mb-4 font-medium uppercase tracking-wider">Apoteker Utama</p>
                                 <div className="space-y-2">
                                     <button className="w-full py-2 bg-gray-50 rounded-lg text-xs font-bold text-gray-600 hover:bg-[#2563EB]/10 hover:text-[#2563EB] transition-colors">
                                         Edit Profile
                                     </button>
-                                    <button className="w-full py-2 bg-red-50 rounded-lg text-xs font-bold text-red-600 hover:bg-red-100 transition-colors">
+                                    {/* EVENT ONCLICK DITAMBAHKAN DI SINI */}
+                                    <button 
+                                        onClick={handleLogout}
+                                        className="w-full py-2 bg-red-50 rounded-lg text-xs font-bold text-red-600 hover:bg-red-100 transition-colors"
+                                    >
                                         Logout
                                     </button>
                                 </div>

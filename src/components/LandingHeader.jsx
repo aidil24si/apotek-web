@@ -20,7 +20,7 @@ export default function LandingHeader() {
         <div className="bg-blue-600 p-2 rounded-lg text-white font-bold flex items-center justify-center w-9 h-9 shadow-sm">
           <MdDashboard size={20} />
         </div>
-        <span className="text-xl font-bold text-gray-900 tracking-tight">MediCare</span>
+        <span className="text-xl font-bold text-gray-900 tracking-tight">Apotek Aidil</span>
       </div>
       
       <div className="hidden md:flex gap-8 font-medium text-gray-600 text-sm">

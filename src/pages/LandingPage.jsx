@@ -195,7 +195,7 @@ export default function LandingPage() {
               <div className="bg-blue-600 p-1.5 rounded text-white font-bold w-7 h-7 flex items-center justify-center text-sm shadow-sm">
                 <MdDashboard />
               </div>
-              <span className="text-lg font-bold text-gray-900 tracking-tight">MediCare</span>
+              <span className="text-lg font-bold text-gray-900 tracking-tight">Apotek Aidil</span>
             </div>
             <p className="text-sm text-gray-500 leading-relaxed">
               Sistem informasi manajemen apotek terpadu yang mempermudah pasien dalam mengakses layanan kesehatan digital.
@@ -232,7 +232,7 @@ export default function LandingPage() {
             <ul className="space-y-3 text-sm text-gray-500">
               <li className="flex items-start gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <MdOutlineLocationOn size={18} className="text-blue-600 shrink-0 mt-0.5" />
-                <span className="leading-tight">Gedung MediCare Center, Jl. Kesehatan No. 123, Jakarta Selatan 12345</span>
+                <span className="leading-tight">Gedung ApotekAidil Center, Jl. Kesehatan No. 123, Jakarta Selatan 12345</span>
               </li>
               <li className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <MdOutlinePhone size={18} className="text-blue-600 shrink-0" />
@@ -243,7 +243,7 @@ export default function LandingPage() {
         </div>
         
         <div className="pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-400">
-          <p>© 2026 MediCare System. Seluruh hak cipta dilindungi.</p>
+          <p>© 2026 Apotek Aidil System. Seluruh hak cipta dilindungi.</p>
           <div className="flex gap-4 font-medium">
             <span className="cursor-pointer hover:text-blue-600">Sistem Versi 2.0</span>
             <span className="cursor-pointer hover:text-blue-600">Status Server: Normal</span>
