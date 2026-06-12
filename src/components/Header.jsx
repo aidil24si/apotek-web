@@ -1,150 +1,139 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Tambahkan import ini
+import { useNavigate } from "react-router-dom";
 import { FaBell, FaSearch, FaBars } from "react-icons/fa";
 import { FcAreaChart } from "react-icons/fc";
 import { SlSettings } from "react-icons/sl";
 
+// Import jajaran komponen premium Shadcn UI untuk Header standar enterprise
+import { Input } from "./ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+
 export default function Header() {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const navigate = useNavigate(); // Inisialisasi fungsi navigasi
+    const navigate = useNavigate();
 
-    // Fungsi untuk menangani proses logout
     const handleLogout = () => {
-        // Jika Anda menggunakan localStorage/sessionStorage, Anda bisa menghapusnya di sini
-        // contoh: localStorage.removeItem("token");
-        
-        // Arahkan kembali ke halaman login (atau "/" jika ingin ke landing page)
+        // Pembersihan storage token diletakkan di sini jika diperlukan
         navigate("/");
     };
 
     return (
-        <div id="header-container" className="flex items-center justify-between bg-white px-4 md:px-10 py-4 shadow-sm relative z-30">
+        <div id="header-container" className="flex items-center justify-between bg-white px-4 md:px-10 py-4 shadow-sm border-b border-gray-100 relative z-30 font-sans">
             
             {/* Bagian Kiri (Logo Mobile & Tombol Hamburger) */}
             <div className="flex items-center gap-4 md:hidden">
-                <button className="text-gray-500 hover:text-[#2563EB] transition-colors p-2">
+                <button className="text-gray-500 hover:text-[#2563EB] transition-colors p-2 rounded-xl hover:bg-gray-50">
                     <FaBars size={20} />
                 </button>
             </div>
 
-            {/* Search Bar (Tersembunyi di Mobile, Tampil di Desktop) */}
-            <div id="search-bar" className="relative hidden md:flex w-full max-w-md items-center">
-                <input
-                    id="search-input"
-                    type="text"
-                    placeholder="Cari Data Obat..."
-                    className="w-full rounded-xl bg-gray-50 py-2.5 pl-4 pr-12 outline-none focus:ring-2 focus:ring-[#2563EB]/20 cursor-pointer border border-transparent focus:bg-white transition-all text-sm"
-                    onClick={() => setIsSearchOpen(true)}
-                    readOnly
-                />
-                <FaSearch id="search-icon" className="absolute right-4 text-gray-400" />
-            </div>
-
-            {/* Modal Pencarian Aktif */}
-            {isSearchOpen && (
-                <div className="fixed inset-0 z-[999] flex items-start justify-center bg-black/40 pt-16 md:pt-24 backdrop-blur-sm animate-in fade-in duration-300 p-4">
-                    <div className="w-full max-w-2xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl animate-in zoom-in-95 duration-300">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-gray-800">Cari Data Cepat</h3>
-                            <button 
-                                onClick={() => setIsSearchOpen(false)}
-                                className="h-8 w-8 flex items-center justify-center rounded-full bg-gray-100 text-gray-500 hover:bg-red-50 hover:text-red-500 transition-colors"
-                            >
-                                ✕
-                            </button>
+            {/* BAR PENCARIAN UTAMA (Menggunakan Dialog Shadcn UI) */}
+            <div id="search-bar" className="relative w-full max-w-md items-center hidden md:flex">
+                <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                    <DialogTrigger asChild>
+                        <div className="relative w-full group cursor-pointer">
+                            <Input
+                                type="text"
+                                placeholder="Cari Data Obat..."
+                                className="w-full bg-gray-50 border-none rounded-xl py-5 pl-4 pr-12 outline-none cursor-pointer transition-all text-sm h-auto shadow-inner group-hover:bg-gray-100/70"
+                                readOnly
+                            />
+                            <FaSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-[#2563EB] transition-colors" />
                         </div>
-                        <div className="relative">
-                            <input 
+                    </DialogTrigger>
+                    
+                    <DialogContent className="sm:max-w-[600px] rounded-[24px] p-6 bg-white border border-gray-100 shadow-2xl animate-in zoom-in-95">
+                        <DialogHeader>
+                            <DialogTitle className="text-lg font-bold text-gray-800 tracking-tight">Cari Data Cepat</DialogTitle>
+                        </DialogHeader>
+                        <div className="relative mt-4 group">
+                            <Input 
                                 autoFocus 
                                 type="text" 
                                 placeholder="Ketik nama obat atau kategori..." 
-                                className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl outline-none border-2 border-[#2563EB] shadow-inner text-sm md:text-base focus:bg-white transition-colors" 
+                                className="w-full py-6 bg-gray-50 rounded-xl border-2 border-transparent focus-visible:border-[#2563EB] focus-visible:ring-4 focus-visible:ring-blue-100 shadow-inner text-base h-auto transition-all pl-4 pr-12"
                             />
-                            <FaSearch className="absolute right-5 top-5 md:top-6 text-[#2563EB] text-lg md:text-xl" />
+                            <FaSearch className="absolute right-5 top-1/2 -translate-y-1/2 text-[#2563EB] text-lg" />
                         </div>
-                        <div className="mt-6 flex flex-wrap gap-2">
-                            <span className="text-[10px] md:text-xs font-bold text-gray-400 uppercase flex items-center">Sering dicari:</span>
+                        <div className="mt-4 flex flex-wrap gap-2 items-center">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Sering dicari:</span>
                             {["Paracetamol", "Antasida", "Vitamin C", "Amoxicillin"].map(item => (
                                 <span 
                                     key={item} 
-                                    className="text-xs bg-gray-100 px-3 py-1.5 rounded-full text-gray-600 cursor-pointer hover:bg-[#2563EB]/10 hover:text-[#2563EB] font-medium transition-colors"
+                                    className="text-xs bg-gray-50 border border-gray-100 px-3 py-1.5 rounded-full text-gray-600 cursor-pointer hover:bg-[#2563EB] hover:text-white hover:border-[#2563EB] font-semibold transition-all"
                                 >
                                     {item}
                                 </span>
                             ))}
                         </div>
-                    </div>
-                    {/* Background Click to Close */}
-                    <div className="fixed inset-0 -z-10" onClick={() => setIsSearchOpen(false)}></div>
-                </div>
-            )}
+                    </DialogContent>
+                </Dialog>
+            </div>
 
-            {/* Icon & Profile Section (Kanan) */}
-            <div id="icons-container" className="flex items-center gap-4 md:gap-8">
+            {/* AREA UTILITAS & PROFIL (KANAN) */}
+            <div id="icons-container" className="flex items-center gap-4 md:gap-6">
                 
-                {/* Search Icon untuk Mobile */}
+                {/* Tombol Trigger Pencarian khusus Layar Mobile */}
                 <button 
-                    className="md:hidden text-gray-500 hover:text-[#2563EB]"
+                    className="md:hidden text-gray-500 hover:text-[#2563EB] p-2 hover:bg-gray-50 rounded-xl transition-colors"
                     onClick={() => setIsSearchOpen(true)}
                 >
                     <FaSearch size={18} />
                 </button>
 
-                {/* Icons Area */}
-                <div className="flex items-center gap-2 md:gap-4">
-                    <div id="notification-icon" className="relative flex h-9 w-9 md:h-10 md:w-10 items-center justify-center rounded-xl bg-blue-50 text-[#2563EB] cursor-pointer hover:bg-blue-100 transition-colors">
-                        <FaBell size={18} className="md:w-5 md:h-5" />
-                        <span id="notification-badge" className="absolute -right-1 -top-1 flex h-4 w-4 md:h-5 md:w-5 items-center justify-center rounded-full bg-red-500 text-[9px] md:text-[10px] font-bold text-white border-2 border-white">
+                {/* Barisan Ikon Notifikasi & Menu Sistem */}
+                <div className="flex items-center gap-2 md:gap-3">
+                    <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-[#2563EB] cursor-pointer hover:bg-blue-100/80 transition-colors">
+                        <FaBell size={16} />
+                        <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-white">
                             3
                         </span>
                     </div>
-                    {/* Sembunyikan ikon tambahan di mobile agar tidak sempit */}
                     <div className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer text-xl transition-colors">
-                        <FcAreaChart />
+                        <FcAreaChart size={20} />
                     </div>
-                    <div className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer text-gray-400 hover:text-gray-600 text-xl transition-colors">
-                        <SlSettings />
+                    <div className="hidden md:flex h-10 w-10 items-center justify-center rounded-xl bg-gray-50 hover:bg-gray-100 cursor-pointer text-gray-400 hover:text-gray-600 transition-colors">
+                        <SlSettings size={16} />
                     </div>
                 </div>
 
-                {/* Garis Pemisah (Hanya Desktop) */}
-                <div className="hidden md:block h-8 w-[1px] bg-gray-200"></div>
+                <div className="hidden md:block h-6 w-[1px] bg-gray-200"></div>
 
-                {/* Profile Tooltip */}
-                <div id="profile-container" className="flex items-center gap-3 md:gap-4 relative group cursor-pointer">
-                    <div className="text-right hidden md:block">
-                        <p className="text-[11px] text-gray-400 font-medium">Welcome,</p>
-                        <p className="text-sm font-bold text-gray-900 tracking-tight">Aidil Ikhsan</p>
-                    </div>
-                    <div className="relative">
-                        <img
-                            id="profile-avatar"
-                            src="/img/Aidil.jpg"
-                            alt="Profile"
-                            className="h-9 w-9 md:h-11 md:w-11 rounded-full border-2 border-[#2563EB] object-cover p-0.5 group-hover:scale-105 transition-transform bg-white"
-                            onError={(e) => { e.target.src = "https://ui-avatars.com/api/?name=Aidil+Ikhsan&background=EFF6FF&color=2563EB" }}
-                        />
-                        {/* Tooltip Card (Muncul saat di-hover pada Desktop) */}
-                        <div className="absolute top-14 right-0 hidden md:group-hover:block w-56 bg-white border border-gray-100 shadow-2xl rounded-2xl p-5 z-50 animate-in slide-in-from-top-2">
-                            <div className="text-center">
-                                <p className="font-bold text-gray-800">Aidil Ikhsan</p>
-                                <p className="text-[10px] text-gray-400 mb-4 font-medium uppercase tracking-wider">Apoteker Utama</p>
-                                <div className="space-y-2">
-                                    <button className="w-full py-2 bg-gray-50 rounded-lg text-xs font-bold text-gray-600 hover:bg-[#2563EB]/10 hover:text-[#2563EB] transition-colors">
-                                        Edit Profile
-                                    </button>
-                                    {/* EVENT ONCLICK DITAMBAHKAN DI SINI */}
-                                    <button 
-                                        onClick={handleLogout}
-                                        className="w-full py-2 bg-red-50 rounded-lg text-xs font-bold text-red-600 hover:bg-red-100 transition-colors"
-                                    >
-                                        Logout
-                                    </button>
-                                </div>
+                {/* SEKSI MENU DROP PROFIL (Menggunakan Dropdown Menu Shadcn UI) */}
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="outline-none">
+                        <div className="flex items-center gap-3 group cursor-pointer text-left">
+                            <div className="text-right hidden md:block">
+                                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider leading-none mb-0.5">Welcome,</p>
+                                <p className="text-sm font-extrabold text-gray-900 tracking-tight group-hover:text-[#2563EB] transition-colors">Aidil Ikhsan</p>
                             </div>
+                            <Avatar className="h-10 w-10 border-2 border-[#2563EB] p-0.5 transition-transform duration-300 group-hover:scale-105 bg-white">
+                                <AvatarImage src="/img/Aidil.jpg" className="rounded-full object-cover" />
+                                <AvatarFallback className="font-bold text-xs bg-blue-50 text-[#2563EB]">AI</AvatarFallback>
+                            </Avatar>
                         </div>
-                    </div>
-                </div>
+                    </DropdownMenuTrigger>
+                    
+                    <DropdownMenuContent className="w-56 bg-white border border-gray-100 shadow-2xl rounded-2xl p-2 mt-2 mr-4 animate-in slide-in-from-top-2" align="end">
+                        <DropdownMenuLabel className="p-3 text-center">
+                            <p className="font-extrabold text-gray-800 text-sm">Aidil Ikhsan</p>
+                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-0.5">Apoteker Utama</p>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-gray-100" />
+                        <DropdownMenuItem className="p-2.5 text-xs font-bold text-gray-600 rounded-xl cursor-pointer focus:bg-blue-50 focus:text-[#2563EB] transition-colors">
+                            Edit Profil Akun
+                        </DropdownMenuItem>
+                        <DropdownMenuItem 
+                            onClick={handleLogout}
+                            className="p-2.5 text-xs font-bold text-red-600 rounded-xl cursor-pointer focus:bg-red-50 focus:text-red-600 transition-colors"
+                        >
+                            Keluar / Logout
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+
             </div>
         </div>
     );
