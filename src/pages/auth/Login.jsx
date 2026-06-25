@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 
@@ -8,17 +8,49 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
+import { supabase } from "../../supabaseClient";
 
 export default function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [errorMsg, setErrorMsg] = useState(""); 
+    const [errorMsg, setErrorMsg] = useState("");
+    const [successMsg, setSuccessMsg] = useState("");
     const [dataForm, setDataForm] = useState({
         email: "",
         password: "",
-        role: "Admin",
+        role: "admin",
     });
+
+    // Cek apakah user sudah login
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Ambil role user dari tabel profiles
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (profile) {
+                    redirectBasedOnRole(profile.role);
+                }
+            }
+        };
+        checkUser();
+    }, [navigate]);
+
+    // Tampilkan pesan sukses dari registrasi
+    useEffect(() => {
+        if (location.state?.message) {
+            setSuccessMsg(location.state.message);
+            // Clear message setelah 5 detik
+            setTimeout(() => setSuccessMsg(""), 5000);
+        }
+    }, [location.state]);
 
     const handleChange = (evt) => {
         const { name, value } = evt.target;
@@ -32,19 +64,54 @@ export default function Login() {
         if (errorMsg) setErrorMsg("");
     };
 
-    const handleSubmit = (e) => {
+    const redirectBasedOnRole = (role) => {
+        const userRole = role?.toLowerCase();
+        if (userRole === "admin") {
+            navigate("/dashboard");
+        } else {
+            navigate("/");
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setErrorMsg(""); 
+        setErrorMsg("");
 
-        setTimeout(() => {
-            setLoading(false);
-            if (dataForm.role === "Admin") {
-                navigate("/dashboard"); 
-            } else {
-                setErrorMsg(`Akses ditolak. Dashboard hanya untuk Admin. (Anda memilih: ${dataForm.role})`);
+        try {
+            // Login dengan Supabase Auth
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: dataForm.email,
+                password: dataForm.password,
+            });
+
+            if (error) {
+                setErrorMsg(error.message || "Email atau password salah.");
+                setLoading(false);
+                return;
             }
-        }, 1500);
+
+            if (data.user) {
+                // Ambil role user dari tabel profiles
+                const { data: profile, error: profileError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', data.user.id)
+                    .single();
+
+                if (profileError || !profile) {
+                    setErrorMsg("Gagal mengambil data profil. Silakan hubungi administrator.");
+                    setLoading(false);
+                    return;
+                }
+
+                // Redirect berdasarkan role
+                redirectBasedOnRole(profile.role);
+            }
+        } catch (err) {
+            setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
+            setLoading(false);
+        }
     };
 
     return (
@@ -58,6 +125,13 @@ export default function Login() {
                     Silakan login untuk melanjutkan operasional sistem
                 </p>
             </div>
+
+            {/* Area Komponen Alert Success */}
+            {successMsg && (
+                <div className="mb-4 p-3.5 rounded-xl bg-green-50 border border-green-100 text-green-600 text-xs font-bold text-center animate-in fade-in zoom-in-95 duration-300">
+                    {successMsg}
+                </div>
+            )}
 
             {/* Area Komponen Alert Error */}
             {errorMsg && (
@@ -125,9 +199,9 @@ export default function Login() {
                             <SelectValue placeholder="Pilih Role" />
                         </SelectTrigger>
                         <SelectContent className="bg-white rounded-xl border border-gray-100 shadow-xl">
-                            <SelectItem value="Admin" className="font-semibold text-sm py-2.5">Admin</SelectItem>
-                            <SelectItem value="Dokter" className="font-semibold text-sm py-2.5">Dokter</SelectItem>
-                            <SelectItem value="Apoteker" className="font-semibold text-sm py-2.5">Apoteker</SelectItem>
+                            <SelectItem value="admin" className="font-semibold text-sm py-2.5">Admin</SelectItem>
+                            <SelectItem value="dokter" className="font-semibold text-sm py-2.5">Dokter</SelectItem>
+                            <SelectItem value="apoteker" className="font-semibold text-sm py-2.5">Apoteker</SelectItem>
                         </SelectContent>
                     </Select>
                 </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import LandingHeader from "../components/LandingHeader"; 
+import LandingHeader from "../components/LandingHeader";
+import Chatbot from "../components/Chatbot";
 import { FiSearch, FiShoppingCart } from "react-icons/fi";
 import { BsCheckCircleFill } from "react-icons/bs";
 import { FaCapsules, FaHeartbeat, FaStethoscope, FaBaby, FaFacebookF, FaInstagram, FaTwitter } from "react-icons/fa";
@@ -309,6 +310,9 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Chatbot Widget */}
+      <Chatbot />
 
     </div>
   );

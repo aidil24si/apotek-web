@@ -5,6 +5,7 @@ import PageHeader from "./components/PageHeader";
 import AuthLayout from "./layouts/AuthLayout";
 import MainLayout from "./layouts/MainLayout";
 import Loading from "./components/Loading";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   // Mengubah nama variabel menjadi LandingPage agar konsisten dengan nama file
@@ -48,14 +49,38 @@ function App() {
         ========================================================= */}
         <Route element={<MainLayout />}>
           {/* Pindahkan Dashboard ke path /dashboard */}
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Dashboard />
+            </ProtectedRoute>
+          } />
 
           {/* Main Routes lainnya */}
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/customers" element={<Customers />} />
-          <Route path="/customers/:id" element={<CustomerDetail />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/inventory/:id" element={<MedicineDetail />} />
+          <Route path="/orders" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Orders />
+            </ProtectedRoute>
+          } />
+          <Route path="/customers" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Customers />
+            </ProtectedRoute>
+          } />
+          <Route path="/customers/:id" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <CustomerDetail />
+            </ProtectedRoute>
+          } />
+          <Route path="/inventory" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <Inventory />
+            </ProtectedRoute>
+          } />
+          <Route path="/inventory/:id" element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <MedicineDetail />
+            </ProtectedRoute>
+          } />
 
 
           {/* Error Pages */}

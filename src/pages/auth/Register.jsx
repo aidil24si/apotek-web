@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
@@ -7,6 +7,8 @@ import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../../components/ui/select";
+import { supabase } from "../../supabaseClient";
 
 export default function Register() {
     const navigate = useNavigate();
@@ -18,7 +20,8 @@ export default function Register() {
     const [dataForm, setDataForm] = useState({ 
         email: "", 
         password: "", 
-        confirmPassword: "" 
+        confirmPassword: "",
+        role: "customer"
     });
 
     const handleChange = (evt) => {
@@ -27,7 +30,12 @@ export default function Register() {
         if (errorMsg) setErrorMsg("");
     };
 
-    const handleSubmit = (e) => {
+    const handleRoleChange = (value) => {
+        setDataForm({ ...dataForm, role: value });
+        if (errorMsg) setErrorMsg("");
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         // Validasi kecocokan password sebelum mengirim request ke API
@@ -36,12 +44,84 @@ export default function Register() {
             return;
         }
 
+        if (dataForm.password.length < 6) {
+            setErrorMsg("Kata sandi harus minimal 6 karakter.");
+            return;
+        }
+
         setLoading(true);
-        setTimeout(() => {
+        setErrorMsg("");
+
+        try {
+            // Registrasi dengan Supabase Auth
+            const { data, error } = await supabase.auth.signUp({
+                email: dataForm.email,
+                password: dataForm.password,
+            });
+
+            if (error) {
+                setErrorMsg(error.message || "Gagal mendaftar. Silakan coba lagi.");
+                setLoading(false);
+                return;
+            }
+
+            if (data.user) {
+                // Simpan data profil ke tabel profiles
+                const { error: profileError } = await supabase
+                    .from('profiles')
+                    .insert([
+                        {
+                            id: data.user.id,
+                            email: dataForm.email,
+                            role: dataForm.role,
+                        }
+                    ]);
+
+                if (profileError) {
+                    console.error("Error saving profile:", profileError);
+                }
+
+                // Logout user yang baru daftar (agar tidak auto-login)
+                await supabase.auth.signOut();
+
+                // Redirect ke halaman login dengan pesan sukses
+                navigate("/login", { 
+                    state: { message: "Registrasi berhasil! Silakan login dengan akun Anda." }
+                });
+            }
+        } catch (err) {
+            setErrorMsg("Terjadi kesalahan sistem. Silakan coba lagi.");
             setLoading(false);
-            navigate("/login");
-        }, 1500);
+        }
     };
+
+    // Cek apakah user sudah login
+    useEffect(() => {
+        const checkUser = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                // Jika sudah login, cek role dan redirect sesuai role
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', session.user.id)
+                    .single();
+                
+                if (profile) {
+                    if (profile.role === 'admin') {
+                        navigate("/dashboard");
+                    } else {
+                        navigate("/");
+                    }
+                } else {
+                    // Jika belum ada profile, logout dan ke login
+                    await supabase.auth.signOut();
+                    navigate("/login");
+                }
+            }
+        };
+        checkUser();
+    }, [navigate]);
 
     return (
         <div className="flex flex-col font-sans">
@@ -78,6 +158,23 @@ export default function Register() {
                         placeholder="nama@email.com" 
                         onChange={handleChange}
                     />
+                </div>
+
+                {/* Dropdown Role */}
+                <div className="space-y-1.5">
+                    <Label className="text-xs font-bold text-[#111827] uppercase tracking-wider ml-0.5">
+                        Role Pengguna
+                    </Label>
+                    <Select defaultValue={dataForm.role} onValueChange={handleRoleChange}>
+                        <SelectTrigger className="w-full bg-[#F3F4F6] border-none rounded-xl font-semibold text-sm text-[#111827] px-4 py-5 shadow-inner focus:ring-4 focus:ring-blue-100 h-auto">
+                            <SelectValue placeholder="Pilih Role" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white rounded-xl border border-gray-100 shadow-xl">
+                            <SelectItem value="customer" className="font-semibold text-sm py-2.5">Customer</SelectItem>
+                            <SelectItem value="dokter" className="font-semibold text-sm py-2.5">Dokter</SelectItem>
+                            <SelectItem value="apoteker" className="font-semibold text-sm py-2.5">Apoteker</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
 
                 {/* Input Password */}
