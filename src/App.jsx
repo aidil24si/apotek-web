@@ -11,8 +11,10 @@ function App() {
   // Mengubah nama variabel menjadi LandingPage agar konsisten dengan nama file
   const LandingPage = React.lazy(() => import("./pages/LandingPage"));
 
-  const Dashboard = React.lazy(() => import("./pages/Dashboard"));
-  const Orders = React.lazy(() => import("./pages/Orders"));
+const Dashboard = React.lazy(() => import("./pages/Dashboard"));
+const DemoDashboard = React.lazy(() => import("./pages/DemoDashboard"));
+const MemberDashboard = React.lazy(() => import("./pages/MemberDashboard"));
+const Orders = React.lazy(() => import("./pages/Orders"));
   const Customers = React.lazy(() => import("./pages/Customers"));
   const ErrorPage = React.lazy(() => import("./pages/ErrorPage"));
   const Login = React.lazy(() => import("./pages/auth/Login"));
@@ -49,11 +51,9 @@ function App() {
         ========================================================= */}
         <Route element={<MainLayout />}>
           {/* Pindahkan Dashboard ke path /dashboard */}
-          <Route path="/dashboard" element={
-            <ProtectedRoute allowedRoles={["admin"]}>
-              <Dashboard />
-            </ProtectedRoute>
-          } />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/demo" element={<DemoDashboard />} />
+          <Route path="/member" element={<MemberDashboard />} />
 
           {/* Main Routes lainnya */}
           <Route path="/orders" element={

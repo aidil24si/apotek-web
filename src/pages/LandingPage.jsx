@@ -70,6 +70,16 @@ export default function LandingPage() {
                   Cari
                 </Button>
               </div>
+
+              {/* Demo Access Buttons */}
+              <div className="flex gap-3 flex-wrap mt-4">
+                <Link to="/demo" className="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-all">
+                  Demo Admin
+                </Link>
+                <Link to="/member" className="bg-green-600 hover:bg-green-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition-all">
+                  Demo Member
+                </Link>
+              </div>
             </div>
             
             <div className="hidden md:flex justify-end relative group">
