@@ -16,6 +16,7 @@ import { Input } from "../components/ui/input";
 import { Card, CardContent } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog";
 
 export default function LandingPage() {
   // State untuk parameter pencarian, filter kategori, dan pengurutan
@@ -24,6 +25,10 @@ export default function LandingPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sortBy, setSortBy] = useState("all");
 
+  // State untuk keranjang belanja (cart) dan modal detail obat (selectedProduct)
+  const [cart, setCart] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   // State untuk hitung mundur flash sale
   const [timeLeft, setTimeLeft] = useState({
     days: 12,
@@ -31,6 +36,27 @@ export default function LandingPage() {
     minutes: 20,
     seconds: 0
   });
+
+  // Logika menambahkan produk ke keranjang belanja
+  const addToCart = (product) => {
+    setCart((prevCart) => {
+      const existingIdx = prevCart.findIndex((item) => item.title === product.title);
+      if (existingIdx > -1) {
+        const updated = [...prevCart];
+        updated[existingIdx].quantity += 1;
+        return updated;
+      }
+      return [...prevCart, { ...product, quantity: 1 }];
+    });
+  };
+
+  // Logika menghapus produk dari keranjang belanja
+  const removeFromCart = (title) => {
+    setCart((prevCart) => prevCart.filter((item) => item.title !== title));
+  };
+
+  // Mengosongkan keranjang belanja
+  const clearCart = () => setCart([]);
 
   // Logika hitung mundur flash sale dinamis
   useEffect(() => {
@@ -54,14 +80,86 @@ export default function LandingPage() {
     return () => clearInterval(timer);
   }, []);
 
-  // Database dummy produk lengkap
+  // Database dummy produk lengkap dengan informasi medis detail
   const allProducts = [
-    { title: "Vitamin C 1000mg", category: "Vitamin", stock: 124, price: 85000, priceString: "Rp 85.000", rating: "4.9", img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-    { title: "Omega 3 Fish Oil", category: "Vitamin", stock: 89, price: 150000, priceString: "Rp 150.000", rating: "4.9", img: "https://images.unsplash.com/photo-1550572017-edb7fd483669?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-    { title: "Susu Formula Bayi", category: "Ibu & Anak", stock: 45, price: 180000, priceString: "Rp 180.000", rating: "4.9", img: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-    { title: "Paracetamol 500mg", category: "Obat Non-Resep", stock: 530, price: 15000, priceString: "Rp 15.000", rating: "4.8", img: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-    { title: "Amoxicillin 500mg", category: "Obat Resep", stock: 120, price: 20000, priceString: "Rp 20.000", rating: "4.7", img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-    { title: "Tensimeter Digital", category: "Alat Kesehatan", stock: 15, price: 350000, priceString: "Rp 350.000", rating: "4.9", img: "https://images.unsplash.com/photo-1631549990815-3732057b545d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" }
+    { 
+      title: "Vitamin C 1000mg", 
+      category: "Vitamin", 
+      stock: 124, 
+      price: 85000, 
+      priceString: "Rp 85.000", 
+      rating: "4.9", 
+      img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Suplemen Vitamin C konsentrasi tinggi untuk memelihara daya tahan tubuh dan mempercepat pemulihan pasca sakit.",
+      composition: "Vitamin C (Asam Askorbat) 1000mg",
+      sideEffects: "Jarang terjadi, pada dosis berlebih dapat memicu diare atau gangguan lambung ringan.",
+      expiryDate: "2027-08-31"
+    },
+    { 
+      title: "Omega 3 Fish Oil", 
+      category: "Vitamin", 
+      stock: 89, 
+      price: 150000, 
+      priceString: "Rp 150.000", 
+      rating: "4.9", 
+      img: "https://images.unsplash.com/photo-1550572017-edb7fd483669?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Minyak ikan kaya asam lemak esensial EPA & DHA untuk kesehatan jantung, otak, dan sendi.",
+      composition: "Fish Oil 1000mg (EPA 180mg, DHA 120mg)",
+      sideEffects: "Rasa amis ringan setelah dikonsumsi pada sebagian kecil orang.",
+      expiryDate: "2027-04-15"
+    },
+    { 
+      title: "Susu Formula Bayi", 
+      category: "Ibu & Anak", 
+      stock: 45, 
+      price: 180000, 
+      priceString: "Rp 180.000", 
+      rating: "4.9", 
+      img: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Susu formula kaya gizi untuk pertumbuhan optimal bayi usia 6-12 bulan pendamping ASI.",
+      composition: "Protein, Karbohidrat, Minyak Nabati, DHA, AA, Prebiotik FOS & GOS",
+      sideEffects: "Hentikan jika bayi menunjukkan alergi laktosa atau gangguan pencernaan.",
+      expiryDate: "2026-12-31"
+    },
+    { 
+      title: "Paracetamol 500mg", 
+      category: "Obat Non-Resep", 
+      stock: 530, 
+      price: 15000, 
+      priceString: "Rp 15.000", 
+      rating: "4.8", 
+      img: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Obat penurun demam dan pereda nyeri sakit kepala, sakit gigi, atau nyeri otot ringan.",
+      composition: "Paracetamol 500mg",
+      sideEffects: "Kerusakan fungsi hati jika dikonsumsi berlebihan atau jangka panjang.",
+      expiryDate: "2028-01-30"
+    },
+    { 
+      title: "Amoxicillin 500mg", 
+      category: "Obat Resep", 
+      stock: 120, 
+      price: 20000, 
+      priceString: "Rp 20.000", 
+      rating: "4.7", 
+      img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Antibiotik spektrum luas golongan penisilin untuk infeksi saluran napas, kulit, dan kemih (Harus dengan resep dokter).",
+      composition: "Amoxicillin Trihydrate 500mg",
+      sideEffects: "Mual, ruam kulit, diare ringan. Wajib dihabiskan untuk mencegah resistensi.",
+      expiryDate: "2026-10-15"
+    },
+    { 
+      title: "Tensimeter Digital", 
+      category: "Alat Kesehatan", 
+      stock: 15, 
+      price: 350000, 
+      priceString: "Rp 350.000", 
+      rating: "4.9", 
+      img: "https://images.unsplash.com/photo-1631549990815-3732057b545d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+      description: "Alat ukur tekanan darah digital lengan atas otomatis dengan sensor pendeteksi detak jantung tidak teratur.",
+      composition: "Manset, Selang Udara, Unit Utama Monitor LCD, Baterai AA",
+      sideEffects: "Tidak ada efek medis. Gunakan sesuai panduan untuk akurasi optimal.",
+      expiryDate: "2031-12-31"
+    }
   ];
 
   // Pemfilteran dan pengurutan obat secara reaktif
@@ -97,11 +195,18 @@ export default function LandingPage() {
     }
   };
 
+  const startConsultation = () => {
+    const event = new CustomEvent("open-chatbot", {
+      detail: { message: "Saya ingin berkonsultasi mengenai resep obat dan keluhan kesehatan" }
+    });
+    window.dispatchEvent(event);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50/60 font-sans text-gray-800 antialiased">
       
-      {/* Header Landing Page */}
-      <LandingHeader />
+      {/* Header Landing Page dengan Drawer Keranjang dan Sesi Dinamis */}
+      <LandingHeader cart={cart} onRemoveFromCart={removeFromCart} onClearCart={clearCart} />
 
       {/* HERO SECTION */}
       <section id="home" className="px-4 md:px-12 py-8 max-w-7xl mx-auto">
@@ -213,17 +318,34 @@ export default function LandingPage() {
                 <p className="text-gray-400 text-sm font-medium mt-0.5">Daftar inventaris obat dan suplemen yang tersedia</p>
               </div>
               
-              {/* Dropdown Filter Berbasis Shadcn UI Select */}
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="w-full md:w-[200px] bg-gray-50 border-gray-200 rounded-xl font-semibold text-xs text-gray-700 px-4 py-5 focus:ring-4 focus:ring-blue-50">
-                  <SelectValue placeholder="Pilih Filter" />
-                </SelectTrigger>
-                <SelectContent className="bg-white rounded-xl border border-gray-100 shadow-xl">
-                  <SelectItem value="all" className="font-semibold text-xs py-2.5">Filter: Semua Produk</SelectItem>
-                  <SelectItem value="new" className="font-semibold text-xs py-2.5">Terbaru</SelectItem>
-                  <SelectItem value="stock" className="font-semibold text-xs py-2.5">Stok Terbanyak</SelectItem>
-                </SelectContent>
-              </Select>
+              <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                {/* Input Pencarian di Katalog */}
+                <div className="flex bg-[#F3F4F6] p-1.5 rounded-xl border border-transparent focus-within:ring-2 ring-blue-100 focus-within:bg-white transition-all items-center shadow-inner w-full sm:w-[220px]">
+                  <FiSearch size={14} className="text-gray-400 ml-2" />
+                  <Input 
+                    type="text" 
+                    placeholder="Cari obat langsung..." 
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSearchInput(e.target.value);
+                    }}
+                    className="border-none bg-transparent shadow-none focus-visible:ring-0 text-xs text-gray-700 py-1 h-auto"
+                  />
+                </div>
+
+                {/* Dropdown Filter Berbasis Shadcn UI Select */}
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="w-full sm:w-[180px] bg-gray-50 border-gray-200 rounded-xl font-semibold text-xs text-gray-700 px-4 py-4 focus:ring-4 focus:ring-blue-50 h-[36px]">
+                    <SelectValue placeholder="Pilih Filter" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white rounded-xl border border-gray-100 shadow-xl">
+                    <SelectItem value="all" className="font-semibold text-xs py-2.5">Filter: Semua Produk</SelectItem>
+                    <SelectItem value="new" className="font-semibold text-xs py-2.5">Terbaru</SelectItem>
+                    <SelectItem value="stock" className="font-semibold text-xs py-2.5">Stok Terbanyak</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             {/* Status Filter Aktif */}
@@ -257,7 +379,11 @@ export default function LandingPage() {
             {/* Grid Katalog Obat */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredProducts.map((item, idx) => (
-                <Card key={idx} className="border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-gray-200/80 transition-all bg-white group">
+                <Card 
+                  key={idx} 
+                  onClick={() => setSelectedProduct(item)}
+                  className="border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-gray-200/80 transition-all bg-white group cursor-pointer"
+                >
                   <CardContent className="p-0">
                     <div className="h-40 bg-gray-50 overflow-hidden border-b border-gray-100 relative">
                       <img src={item.img} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
@@ -275,6 +401,10 @@ export default function LandingPage() {
                         <p className="font-extrabold text-blue-600 text-base">{item.priceString}</p>
                         <Button 
                           size="icon"
+                          onClick={(e) => {
+                            e.stopPropagation(); // Mencegah terbukanya modal detail
+                            addToCart(item);
+                          }}
                           className="bg-gray-50 hover:bg-blue-600 hover:text-white text-gray-600 p-2 rounded-xl transition-all border border-gray-200/60 hover:border-blue-600 h-9 w-9"
                         >
                           <FiShoppingCart size={15} />
@@ -358,6 +488,7 @@ export default function LandingPage() {
                 <li className="flex items-center gap-2.5"><BsCheckCircleFill className="text-blue-600 text-base" /> Terintegrasi dengan resep elektronik</li>
               </ul>
               <Button 
+                onClick={startConsultation}
                 variant="outline"
                 className="border-gray-200 hover:border-blue-600 hover:bg-blue-50 text-blue-600 px-6 py-5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 shadow-sm mt-2"
               >
@@ -439,6 +570,69 @@ export default function LandingPage() {
 
       {/* Chatbot Widget */}
       <Chatbot />
+
+      {/* Modal Quick View Detail Obat (Shadcn Dialog) */}
+      {selectedProduct && (
+        <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
+          <DialogContent className="max-w-md bg-white rounded-[2rem] border border-gray-100 p-6 shadow-2xl overflow-hidden font-sans">
+            <DialogHeader className="space-y-3 pb-4 border-b border-gray-100">
+              <div className="h-48 rounded-2xl overflow-hidden border border-gray-100 relative">
+                <img src={selectedProduct.img} alt={selectedProduct.title} className="w-full h-full object-cover" />
+              </div>
+              <DialogTitle className="text-lg font-extrabold text-gray-900 tracking-tight">
+                {selectedProduct.title}
+              </DialogTitle>
+              <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 px-2.5 py-1 text-xs border border-blue-100/50 shadow-none font-bold w-fit">
+                Kategori: {selectedProduct.category}
+              </Badge>
+            </DialogHeader>
+            
+            <div className="space-y-4 py-4 text-xs font-medium text-gray-600">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase">Sisa Stok</p>
+                  <p className="text-sm font-black text-gray-800 mt-0.5">{selectedProduct.stock} unit</p>
+                </div>
+                <div className="bg-gray-50 p-3 rounded-2xl border border-gray-100">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase">Harga</p>
+                  <p className="text-sm font-black text-blue-600 mt-0.5">{selectedProduct.priceString}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-1 bg-gray-50 p-3.5 rounded-2xl border border-gray-100">
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Deskripsi Medis</p>
+                <p className="leading-relaxed text-gray-700 mt-1">
+                  {selectedProduct.description}
+                </p>
+              </div>
+
+              <div className="space-y-2 bg-gray-50 p-3.5 rounded-2xl border border-gray-100">
+                <p className="text-[10px] text-gray-400 font-bold uppercase">Detail Tambahan</p>
+                <div className="grid grid-cols-2 gap-y-2 text-[10px] font-semibold text-gray-500 pt-1">
+                  <div>Komposisi:</div>
+                  <div className="text-gray-800 font-bold text-right">{selectedProduct.composition}</div>
+                  
+                  <div>Efek Samping:</div>
+                  <div className="text-gray-800 font-bold text-right">{selectedProduct.sideEffects}</div>
+                  
+                  <div>Exp. Date:</div>
+                  <div className="text-gray-800 font-bold text-right">{selectedProduct.expiryDate}</div>
+                </div>
+              </div>
+            </div>
+            
+            <Button 
+              onClick={() => {
+                addToCart(selectedProduct);
+                setSelectedProduct(null);
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-5 rounded-xl shadow-md shadow-blue-600/10 h-auto"
+            >
+              Tambah ke Keranjang
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
 
     </div>
   );

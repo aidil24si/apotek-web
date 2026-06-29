@@ -31,6 +31,28 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    const handleOpenChatbot = (e) => {
+      setIsOpen(true);
+      if (e.detail?.message) {
+        setMessages(prev => [...prev, { type: "user", text: e.detail.message }]);
+        setIsTyping(true);
+        
+        setTimeout(() => {
+          setIsTyping(false);
+          setMessages(prev => [...prev, {
+            type: "bot",
+            text: "Halo! 👋 Saya di sini untuk melayani konsultasi kesehatan Anda secara online. Silakan jelaskan gejala medis Anda atau obat yang ingin Anda tanyakan.",
+            options: ["Cek Ketersediaan Obat", "Info Dokter", "Kembali ke Menu Utama"]
+          }]);
+        }, 1000);
+      }
+    };
+
+    window.addEventListener("open-chatbot", handleOpenChatbot);
+    return () => window.removeEventListener("open-chatbot", handleOpenChatbot);
+  }, []);
+
   const handleOptionClick = (option) => {
     // Add user message
     setMessages(prev => [...prev, { type: "user", text: option }]);
