@@ -43,6 +43,7 @@ export default function Chatbot() {
 
       switch (option) {
         case "Cek Ketersediaan Obat":
+        case "Cek Obat Lainnya":
           botResponse = {
             type: "bot",
             text: "Berikut adalah beberapa obat yang tersedia di apotek kami:",
@@ -56,7 +57,8 @@ export default function Chatbot() {
             options: [
               "Dr. Sarah Wijaya - Spesialis Penyakit Dalam",
               "Dr. Ahmad Hidayat - Spesialis Anak",
-              "Dr. Siti Nurhaliza - Spesialis Kandungan"
+              "Dr. Siti Nurhaliza - Spesialis Kandungan",
+              "Kembali ke Menu Utama"
             ]
           };
           break;
@@ -65,6 +67,18 @@ export default function Chatbot() {
             type: "bot",
             text: "📍 Alamat: Jl. Kesehatan No. 123, Jakarta Pusat\n\n🕐 Jam Operasional:\nSenin - Jumat: 08:00 - 21:00\nSabtu - Minggu: 09:00 - 18:00\n\n📞 Telepon: (021) 1234-5678",
             options: ["Kembali ke Menu Utama"]
+          };
+          break;
+        case "Kembali ke Menu Utama":
+          botResponse = {
+            type: "bot",
+            text: "Halo! 👋 Ada yang bisa saya bantu lagi?",
+            options: [
+              "Cek Ketersediaan Obat",
+              "Info Dokter",
+              "Alamat & Jam Operasional",
+              "Lainnya"
+            ]
           };
           break;
         case "Lainnya":
@@ -114,20 +128,40 @@ export default function Chatbot() {
 
   const handleSendMessage = (e) => {
     e.preventDefault();
-    if (!inputValue.trim()) return;
+    const query = inputValue.trim();
+    if (!query) return;
 
-    setMessages(prev => [...prev, { type: "user", text: inputValue }]);
+    setMessages(prev => [...prev, { type: "user", text: query }]);
     setIsTyping(true);
     setInputValue("");
 
     setTimeout(() => {
       setIsTyping(false);
-      setMessages(prev => [...prev, {
-        type: "bot",
-        text: "Terima kasih atas pesan Anda. Tim kami akan segera merespon. Untuk informasi lebih lanjut, silakan hubungi kami di (021) 1234-5678.",
-        options: ["Kembali ke Menu Utama"]
-      }]);
-    }, 1500);
+      
+      const foundMedicine = medicinesData.find(med => 
+        med.name.toLowerCase().includes(query.toLowerCase())
+      );
+
+      if (foundMedicine) {
+        setMessages(prev => [...prev, {
+          type: "bot",
+          text: `📦 **Hasil Pencarian Obat:**\n\n` +
+                `**Nama:** ${foundMedicine.name}\n` +
+                `**Kategori:** ${foundMedicine.category}\n` +
+                `**Stok:** ${foundMedicine.stock} ${foundMedicine.unit}\n` +
+                `**Harga:** ${foundMedicine.price}\n` +
+                `**Deskripsi:** ${foundMedicine.description}\n\n` +
+                `Apakah ada yang bisa saya bantu lagi?`,
+          options: ["Cek Ketersediaan Obat", "Kembali ke Menu Utama"]
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          type: "bot",
+          text: `Saya tidak menemukan obat dengan kata kunci "${query}". Ingin mengecek katalog ketersediaan obat kami?`,
+          options: ["Cek Ketersediaan Obat", "Kembali ke Menu Utama"]
+        }]);
+      }
+    }, 1200);
   };
 
   return (

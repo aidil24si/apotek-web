@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import LandingHeader from "../components/LandingHeader";
 import Chatbot from "../components/Chatbot";
@@ -18,6 +18,68 @@ import { Badge } from "../components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "../components/ui/select";
 
 export default function LandingPage() {
+  // State untuk parameter pencarian, filter kategori, dan pengurutan
+  const [searchInput, setSearchInput] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeCategory, setActiveCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("all");
+
+  // State untuk hitung mundur flash sale
+  const [timeLeft, setTimeLeft] = useState({
+    days: 12,
+    hours: 4,
+    minutes: 20,
+    seconds: 0
+  });
+
+  // Logika hitung mundur flash sale dinamis
+  useEffect(() => {
+    let totalSeconds = timeLeft.days * 86400 + timeLeft.hours * 3600 + timeLeft.minutes * 60 + timeLeft.seconds;
+
+    const timer = setInterval(() => {
+      if (totalSeconds <= 0) {
+        clearInterval(timer);
+        return;
+      }
+      totalSeconds -= 1;
+
+      const d = Math.floor(totalSeconds / 86400);
+      const h = Math.floor((totalSeconds % 86400) / 3600);
+      const m = Math.floor((totalSeconds % 3600) / 60);
+      const s = totalSeconds % 60;
+
+      setTimeLeft({ days: d, hours: h, minutes: m, seconds: s });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  // Database dummy produk lengkap
+  const allProducts = [
+    { title: "Vitamin C 1000mg", category: "Vitamin", stock: 124, price: 85000, priceString: "Rp 85.000", rating: "4.9", img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
+    { title: "Omega 3 Fish Oil", category: "Vitamin", stock: 89, price: 150000, priceString: "Rp 150.000", rating: "4.9", img: "https://images.unsplash.com/photo-1550572017-edb7fd483669?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
+    { title: "Susu Formula Bayi", category: "Ibu & Anak", stock: 45, price: 180000, priceString: "Rp 180.000", rating: "4.9", img: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
+    { title: "Paracetamol 500mg", category: "Obat Non-Resep", stock: 530, price: 15000, priceString: "Rp 15.000", rating: "4.8", img: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
+    { title: "Amoxicillin 500mg", category: "Obat Resep", stock: 120, price: 20000, priceString: "Rp 20.000", rating: "4.7", img: "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
+    { title: "Tensimeter Digital", category: "Alat Kesehatan", stock: 15, price: 350000, priceString: "Rp 350.000", rating: "4.9", img: "https://images.unsplash.com/photo-1631549990815-3732057b545d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" }
+  ];
+
+  // Pemfilteran dan pengurutan obat secara reaktif
+  const filteredProducts = allProducts
+    .filter(item => {
+      const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = activeCategory === "all" || item.category === activeCategory;
+      return matchesSearch && matchesCategory;
+    })
+    .sort((a, b) => {
+      if (sortBy === "new") {
+        return b.title.localeCompare(a.title);
+      }
+      if (sortBy === "stock") {
+        return b.stock - a.stock;
+      }
+      return 0;
+    });
   
   // Fungsi penanganan navigasi gulir halus (Smooth scroll anchors)
   const scrollToSection = (id) => {
@@ -25,6 +87,13 @@ export default function LandingPage() {
     if (element) {
       const y = element.getBoundingClientRect().top + window.scrollY - 80;
       window.scrollTo({ top: y, behavior: "smooth" });
+    }
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter") {
+      setSearchQuery(searchInput);
+      scrollToSection("produk");
     }
   };
 
@@ -61,10 +130,16 @@ export default function LandingPage() {
                 <Input 
                   type="text" 
                   placeholder="Cari nama obat atau SKU..." 
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={handleSearchKeyDown}
                   className="border-none bg-transparent shadow-none focus-visible:ring-0 text-sm text-gray-700 py-2 h-auto"
                 />
                 <Button 
-                  onClick={() => scrollToSection("produk")} 
+                  onClick={() => {
+                    setSearchQuery(searchInput);
+                    scrollToSection("produk");
+                  }} 
                   className="bg-blue-600 text-white px-5 py-5 rounded-xl text-sm font-bold hover:bg-blue-700 transition-all shadow-md shadow-blue-600/10"
                 >
                   Cari
@@ -106,10 +181,19 @@ export default function LandingPage() {
           ].map((cat, idx) => (
             <Card 
               key={idx} 
-              className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-4 cursor-pointer hover:border-blue-500 hover:shadow-md transition-all group overflow-hidden"
+              onClick={() => {
+                const newCat = activeCategory === cat.name ? "all" : cat.name;
+                setActiveCategory(newCat);
+                scrollToSection("produk");
+              }}
+              className={`bg-white p-4 rounded-2xl border shadow-sm flex items-center gap-4 cursor-pointer hover:shadow-md transition-all group overflow-hidden ${
+                activeCategory === cat.name ? "border-blue-500 ring-2 ring-blue-100" : "border-gray-100"
+              }`}
             >
               <CardContent className="p-0 flex items-center gap-4 w-full">
-                <div className="bg-blue-50 text-blue-600 p-3 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300">
+                <div className={`p-3 rounded-xl transition-colors duration-300 ${
+                  activeCategory === cat.name ? "bg-blue-600 text-white" : "bg-blue-50 text-blue-600 group-hover:bg-blue-600 group-hover:text-white"
+                }`}>
                   {cat.icon}
                 </div>
                 <p className="font-bold text-gray-700 text-xs md:text-sm tracking-tight">{cat.name}</p>
@@ -130,7 +214,7 @@ export default function LandingPage() {
               </div>
               
               {/* Dropdown Filter Berbasis Shadcn UI Select */}
-              <Select defaultValue="all">
+              <Select value={sortBy} onValueChange={setSortBy}>
                 <SelectTrigger className="w-full md:w-[200px] bg-gray-50 border-gray-200 rounded-xl font-semibold text-xs text-gray-700 px-4 py-5 focus:ring-4 focus:ring-blue-50">
                   <SelectValue placeholder="Pilih Filter" />
                 </SelectTrigger>
@@ -142,14 +226,37 @@ export default function LandingPage() {
               </Select>
             </div>
 
+            {/* Status Filter Aktif */}
+            {(activeCategory !== "all" || searchQuery !== "") && (
+              <div className="flex items-center gap-2 mb-6 flex-wrap">
+                <span className="text-xs text-gray-400 font-semibold">Filter aktif:</span>
+                {activeCategory !== "all" && (
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border border-blue-100/50 hover:bg-blue-50 text-xs py-1 px-2.5 rounded-lg font-bold">
+                    Kategori: {activeCategory}
+                  </Badge>
+                )}
+                {searchQuery !== "" && (
+                  <Badge variant="secondary" className="bg-blue-50 text-blue-700 border border-blue-100/50 hover:bg-blue-50 text-xs py-1 px-2.5 rounded-lg font-bold">
+                    Pencarian: "{searchQuery}"
+                  </Badge>
+                )}
+                <Button 
+                  variant="ghost" 
+                  onClick={() => {
+                    setActiveCategory("all");
+                    setSearchQuery("");
+                    setSearchInput("");
+                  }} 
+                  className="text-red-500 hover:text-red-700 hover:bg-red-50 text-[11px] font-bold py-1 px-2.5 h-auto rounded-lg transition-all"
+                >
+                  Reset Filter
+                </Button>
+              </div>
+            )}
+
             {/* Grid Katalog Obat */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {[
-                { title: "Vitamin C 1000mg", stock: "124", price: "Rp 85.000", rating: "4.9", img: "https://images.unsplash.com/photo-1584017911766-d451b3d0e843?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { title: "Omega 3 Fish Oil", stock: "89", price: "Rp 150.000", rating: "4.9", img: "https://images.unsplash.com/photo-1550572017-edb7fd483669?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { title: "Susu Formula Bayi", stock: "45", price: "Rp 180.000", rating: "4.9", img: "https://images.unsplash.com/photo-1555252333-9f8e92e65df9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-                { title: "Paracetamol 500mg", stock: "530", price: "Rp 15.000", rating: "4.8", img: "https://images.unsplash.com/photo-1607619056574-7b8d3ee536b2?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" },
-              ].map((item, idx) => (
+              {filteredProducts.map((item, idx) => (
                 <Card key={idx} className="border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-gray-200/80 transition-all bg-white group">
                   <CardContent className="p-0">
                     <div className="h-40 bg-gray-50 overflow-hidden border-b border-gray-100 relative">
@@ -165,7 +272,7 @@ export default function LandingPage() {
                       <p className="text-gray-400 text-xs font-medium">Sisa Stok: <span className="font-bold text-gray-700">{item.stock}</span></p>
                       
                       <div className="flex justify-between items-center mt-5">
-                        <p className="font-extrabold text-blue-600 text-base">{item.price}</p>
+                        <p className="font-extrabold text-blue-600 text-base">{item.priceString}</p>
                         <Button 
                           size="icon"
                           className="bg-gray-50 hover:bg-blue-600 hover:text-white text-gray-600 p-2 rounded-xl transition-all border border-gray-200/60 hover:border-blue-600 h-9 w-9"
@@ -177,6 +284,11 @@ export default function LandingPage() {
                   </CardContent>
                 </Card>
               ))}
+              {filteredProducts.length === 0 && (
+                <div className="col-span-full py-12 text-center text-gray-400 text-sm font-medium">
+                  Tidak ada produk yang cocok dengan kriteria pencarian atau kategori Anda.
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -200,16 +312,20 @@ export default function LandingPage() {
               <p className="text-[10px] text-gray-400 font-bold mb-3 uppercase tracking-wider">Berakhir Dalam</p>
               <div className="flex gap-3 text-center">
                 <div className="bg-gray-50 rounded-xl p-2.5 w-14 border border-gray-100">
-                  <p className="text-xl font-extrabold text-blue-600">12</p>
+                  <p className="text-xl font-extrabold text-blue-600">{String(timeLeft.days).padStart(2, "0")}</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase mt-0.5">Hari</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-2.5 w-14 border border-gray-100">
-                  <p className="text-xl font-extrabold text-blue-600">04</p>
+                  <p className="text-xl font-extrabold text-blue-600">{String(timeLeft.hours).padStart(2, "0")}</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase mt-0.5">Jam</p>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-2.5 w-14 border border-gray-100">
-                  <p className="text-xl font-extrabold text-blue-600">20</p>
+                  <p className="text-xl font-extrabold text-blue-600">{String(timeLeft.minutes).padStart(2, "0")}</p>
                   <p className="text-[9px] text-gray-400 font-bold uppercase mt-0.5">Menit</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-2.5 w-14 border border-gray-100">
+                  <p className="text-xl font-extrabold text-blue-600">{String(timeLeft.seconds).padStart(2, "0")}</p>
+                  <p className="text-[9px] text-gray-400 font-bold uppercase mt-0.5">Detik</p>
                 </div>
               </div>
               <Button 
