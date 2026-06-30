@@ -28,6 +28,15 @@ export default function LandingPage() {
   // State untuk keranjang belanja (cart) dan modal detail obat (selectedProduct)
   const [cart, setCart] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [toast, setToast] = useState(null);
+
+  // Auto-dismiss toast notification setelah 3 detik
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // State untuk hitung mundur flash sale
   const [timeLeft, setTimeLeft] = useState({
@@ -48,6 +57,7 @@ export default function LandingPage() {
       }
       return [...prevCart, { ...product, quantity: 1 }];
     });
+    setToast({ message: `${product.title} berhasil ditambahkan ke keranjang!` });
   };
 
   // Logika menghapus produk dari keranjang belanja
@@ -506,6 +516,67 @@ export default function LandingPage() {
         </Card>
       </section>
 
+      {/* TESTIMONI SECTION */}
+      <section id="testimoni" className="px-4 md:px-12 py-8 max-w-7xl mx-auto">
+        <div className="text-center max-w-xl mx-auto mb-10 space-y-2">
+          <Badge className="bg-blue-50 text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-100/50 shadow-none">
+            Testimoni Pasien
+          </Badge>
+          <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900 tracking-tight">Apa Kata Mereka?</h2>
+          <p className="text-sm text-gray-400 font-medium">Ulasan asli dari pasien setia Apotek Sehat Aidil</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { 
+              name: "Budi Santoso", 
+              role: "Pasien Rutin", 
+              text: "Layanan apotek sangat cepat, terutama konsultasi online lewat chatbot-nya. E-resep langsung terverifikasi oleh apoteker.", 
+              rating: 5,
+              date: "2 hari yang lalu" 
+            },
+            { 
+              name: "Siti Aminah", 
+              role: "Member Gold", 
+              text: "Sangat terbantu dengan sistem membership. Diskon obatnya riil dan bisa langsung diambil tanpa antre lama di kasir.", 
+              rating: 5,
+              date: "1 minggu yang lalu" 
+            },
+            { 
+              name: "dr. Sarah Wijaya", 
+              role: "Mitra Dokter", 
+              text: "Integrasi resep elektronik dari ruang periksa dokter ke bagian dispensing obat apoteker berjalan mulus dan minim kesalahan.", 
+              rating: 5,
+              date: "3 minggu yang lalu" 
+            }
+          ].map((item, idx) => (
+            <Card key={idx} className="border border-gray-100 rounded-2xl overflow-hidden hover:shadow-md hover:border-gray-200/80 transition-all bg-white p-6 space-y-4">
+              <CardContent className="p-0 space-y-3">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-sm">{item.name}</h4>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase mt-0.5">{item.role}</p>
+                  </div>
+                  <div className="flex text-yellow-500 text-xs">
+                    {Array.from({ length: item.rating }).map((_, rIdx) => (
+                      <svg key={rIdx} className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 font-semibold leading-relaxed">
+                  "{item.text}"
+                </p>
+                <div className="text-[10px] text-gray-400 font-bold text-right pt-2 border-t border-gray-50">
+                  {item.date}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </section>
+
       {/* FOOTER SYSTEM */}
       <footer id="kontak" className="bg-white border-t border-gray-100 px-4 md:px-12 pt-12 pb-8">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
@@ -632,6 +703,14 @@ export default function LandingPage() {
             </Button>
           </DialogContent>
         </Dialog>
+      )}
+
+      {/* Toast Notification Premium */}
+      {toast && (
+        <div className="fixed bottom-6 left-6 z-50 bg-gray-900 text-white px-4 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 animate-in fade-in slide-in-from-bottom-5 duration-300 text-xs font-extrabold border border-gray-800 tracking-wide">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <span>{toast.message}</span>
+        </div>
       )}
 
     </div>

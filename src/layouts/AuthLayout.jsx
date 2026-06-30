@@ -1,14 +1,17 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 // Import komponen Card dari ekosistem Shadcn UI untuk standardisasi kontainer
 import { Card, CardContent } from "../components/ui/card";
 
 export default function AuthLayout() {
+    const location = useLocation();
+    const isLogin = location.pathname === "/login";
+
     return (
         <div className="min-h-screen w-full bg-[#F9FAFB] flex items-center justify-center p-4 font-sans">
             
             {/* Kartu Putih Utama menggunakan Shadcn Card */}
-            <Card className="bg-white w-full max-w-[400px] rounded-[24px] border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+            <Card className={`bg-white w-full rounded-[24px] border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden animate-in fade-in zoom-in-95 duration-500 transition-all ${isLogin ? "max-w-[400px] lg:max-w-[800px]" : "max-w-[400px]"}`}>
                 <CardContent className="p-6 md:p-8 flex flex-col justify-center">
                     
                     {/* Logo Aplikasi Apotek */}

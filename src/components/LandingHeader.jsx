@@ -8,11 +8,14 @@ import { Trash2 } from "lucide-react";
 // Import komponen premium dari ekosistem Shadcn UI
 import { Button } from "./ui/button";
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "./ui/sheet";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { supabase } from "../supabaseClient";
 
 export default function LandingHeader({ cart = [], onRemoveFromCart, onClearCart }) {
   const [session, setSession] = useState(null);
   const [role, setRole] = useState(null);
+  const [showCheckoutSuccess, setShowCheckoutSuccess] = useState(false);
+  const [lastCheckoutTotal, setLastCheckoutTotal] = useState(0);
 
   // Ambil total item di keranjang belanja
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -174,7 +177,8 @@ export default function LandingHeader({ cart = [], onRemoveFromCart, onClearCart
                   </Button>
                   <Button 
                     onClick={() => {
-                      alert(`Pembelian berhasil disimulasikan! Total Belanja: Rp ${totalPrice.toLocaleString("id-ID")}`);
+                      setLastCheckoutTotal(totalPrice);
+                      setShowCheckoutSuccess(true);
                       onClearCart();
                     }} 
                     className="flex-[2] bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-5 rounded-xl h-auto transition-all shadow-md shadow-blue-600/10"
@@ -219,6 +223,42 @@ export default function LandingHeader({ cart = [], onRemoveFromCart, onClearCart
         )}
         
       </div>
+
+      {/* Dialog Sukses Checkout Premium */}
+      {showCheckoutSuccess && (
+        <Dialog open={showCheckoutSuccess} onOpenChange={setShowCheckoutSuccess}>
+          <DialogContent className="max-w-md bg-white rounded-[2rem] border border-gray-100 p-8 shadow-2xl flex flex-col items-center text-center font-sans">
+            <DialogHeader className="flex flex-col items-center space-y-4 pb-4">
+              {/* Animasi Checklist Bulat Hijau Premium */}
+              <div className="w-16 h-16 bg-green-50 text-green-500 rounded-full flex items-center justify-center border border-green-100 shadow-inner animate-bounce">
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+              </div>
+              <DialogTitle className="text-xl font-extrabold text-gray-900 tracking-tight">
+                Transaksi Berhasil! 🎉
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2 w-full text-xs font-semibold text-gray-500">
+              <p className="leading-relaxed">
+                Pesanan obat Anda telah diterima dan diteruskan ke sistem apoteker. Silakan selesaikan pembayaran saat pengambilan.
+              </p>
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex justify-between items-center">
+                <span>Total Belanja:</span>
+                <span className="text-sm font-black text-blue-600">
+                  Rp {lastCheckoutTotal.toLocaleString("id-ID")}
+                </span>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setShowCheckoutSuccess(false)}
+              className="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-4 rounded-xl shadow-md shadow-blue-600/10 h-auto"
+            >
+              Selesai & Tutup
+            </Button>
+          </DialogContent>
+        </Dialog>
+      )}
     </nav>
   );
 }

@@ -14,6 +14,8 @@ function App() {
 const Dashboard = React.lazy(() => import("./pages/Dashboard"));
 const DemoDashboard = React.lazy(() => import("./pages/DemoDashboard"));
 const MemberDashboard = React.lazy(() => import("./pages/MemberDashboard"));
+const DoctorDashboard = React.lazy(() => import("./pages/DoctorDashboard"));
+const PharmacistDashboard = React.lazy(() => import("./pages/PharmacistDashboard"));
 const Orders = React.lazy(() => import("./pages/Orders"));
   const Customers = React.lazy(() => import("./pages/Customers"));
   const ErrorPage = React.lazy(() => import("./pages/ErrorPage"));
@@ -53,7 +55,21 @@ const Orders = React.lazy(() => import("./pages/Orders"));
           {/* Pindahkan Dashboard ke path /dashboard */}
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/demo" element={<DemoDashboard />} />
-          <Route path="/member" element={<MemberDashboard />} />
+          <Route path="/member" element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <MemberDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/dokter" element={
+            <ProtectedRoute allowedRoles={["dokter"]}>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          } />
+          <Route path="/apoteker" element={
+            <ProtectedRoute allowedRoles={["apoteker"]}>
+              <PharmacistDashboard />
+            </ProtectedRoute>
+          } />
 
           {/* Main Routes lainnya */}
           <Route path="/orders" element={
